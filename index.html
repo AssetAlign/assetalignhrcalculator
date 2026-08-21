@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AssetAlign — Employer Flex Fund Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:   #0d1f33;
+    --navy2:  #162b45;
+    --navy3:  #1e3a57;
+    --gold:   #f5a623;
+    --gold2:  #e8c56a;
+    --gold3:  #c9843a;
+    --cream:  #f8f5ef;
+    --white:  #ffffff;
+    --text:   #1a2d42;
+    --muted:  #5a6a7a;
+    --light:  #eef2f7;
+    --green:  #1d8a5e;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.5;
+  }
+
+  .section { padding: 64px 32px; position: relative; overflow: hidden; }
+  .container { max-width: 760px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 60%, #0a3d6b 100%);
+    padding: 56px 32px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 80% 50%, rgba(245,166,35,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -120px;
+    right: -120px;
+    width: 460px;
+    height: 460px;
+    border-radius: 50%;
+    border: 2px solid rgba(245,166,35,0.15);
+    pointer-events: none;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .logo-mark {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 21px;
+    color: var(--navy);
+    flex-shrink: 0;
+  }
+
+  .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: 0.02em;
+  }
+
+  .logo-name span { color: var(--gold); }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4.4vw, 44px);
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 em { font-style: normal; color: var(--gold); }
+
+  .hero p {
+    font-size: 16px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.7;
+    margin-bottom: 28px;
+    max-width: 600px;
+  }
+
+  .pill-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .pill {
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .pill-fill {
+    background: var(--gold);
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  .pill-outline {
+    border: 1.5px solid rgba(245,166,35,0.5);
+    color: var(--gold2);
+  }
+
+  /* ── CALCULATOR SECTION ── */
+  .calc { background: var(--cream); }
+
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold3);
+    margin-bottom: 12px;
+  }
+
+  .section-h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 3.6vw, 36px);
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+
+  .section-h2 span { color: var(--gold3); }
+
+  .section-sub {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 36px;
+    max-width: 600px;
+  }
+
+  /* Input cards */
+  .input-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    margin-bottom: 18px;
+    border-top: 4px solid var(--gold);
+    box-shadow: 0 4px 24px rgba(13,31,51,0.07);
+  }
+
+  .input-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .emp-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--navy);
+    text-align: center;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .emp-sub {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 22px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .rate-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .rate-val-wrap { display: flex; align-items: baseline; gap: 2px; }
+
+  .rate-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .rate-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--gold3);
+    font-weight: 600;
+  }
+
+  .rate-note {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  /* Slider styling — gold thumbs, soft track */
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--gold2) 0%, var(--gold) 100%);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold3));
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(245,166,35,0.4);
+    border: 2px solid var(--white);
+  }
+
+  input[type=range]::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold3));
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(245,166,35,0.4);
+    border: 2px solid var(--white);
+  }
+
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Result cards */
+  .result-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 32px 28px;
+    margin-bottom: 12px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(13,31,51,0.08);
+    border-top: 4px solid var(--gold);
+  }
+
+  .result-card.employee { border-top-color: var(--green); }
+
+  .result-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold3);
+    margin-bottom: 10px;
+  }
+
+  .result-card.employee .result-label { color: var(--green); }
+
+  .result-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+
+  .result-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .proj-grid {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 12px;
+    margin-bottom: 8px;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .proj-grid.visible { opacity: 1; }
+
+  .proj-card {
+    border-radius: 12px;
+    padding: 18px 16px;
+    text-align: center;
+    background: var(--white);
+    border: 1px solid rgba(245,166,35,0.25);
+  }
+
+  .proj-card.r { border-color: rgba(29,138,94,0.25); }
+
+  .proj-card .yr {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold3);
+    margin-bottom: 6px;
+  }
+
+  .proj-card.r .yr { color: var(--green); }
+
+  .proj-card .pv {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .proj-note {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 22px;
+    font-style: italic;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .proj-note.visible { opacity: 1; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(13,31,51,0.08);
+    margin: 12px 0 36px;
+  }
+
+  /* Accordions */
+  .accordion { margin-bottom: 12px; }
+
+  .acc-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 26px;
+    cursor: pointer;
+    background: var(--white);
+    border: 1px solid rgba(13,31,51,0.08);
+    border-radius: 14px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 12px rgba(13,31,51,0.04);
+  }
+
+  .acc-toggle:hover {
+    border-color: rgba(245,166,35,0.4);
+    box-shadow: 0 4px 16px rgba(245,166,35,0.12);
+  }
+
+  .acc-toggle.open {
+    border-radius: 14px 14px 0 0;
+    border-bottom-color: transparent;
+  }
+
+  .acc-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .acc-sublabel {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--gold3);
+    font-weight: 600;
+  }
+
+  .acc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--navy);
+    text-align: left;
+  }
+
+  .acc-right {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.06));
+    border: 1px solid rgba(245,166,35,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .acc-icon {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    color: var(--gold3);
+  }
+
+  .acc-icon.open { transform: rotate(180deg); }
+
+  .acc-panel {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.5s ease;
+  }
+
+  .acc-panel.open { max-height: 700px; }
+
+  .acc-inner {
+    padding: 24px 28px 28px;
+    background: var(--white);
+    border: 1px solid rgba(13,31,51,0.08);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+  }
+
+  .acc-inner p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  .easy-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .easy-item {
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 16px 14px;
+    border-left: 3px solid var(--gold);
+  }
+
+  .easy-item .ei-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .easy-item .ei-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* CTA section — navy bg */
+  .cta {
+    background: linear-gradient(160deg, var(--navy) 0%, var(--navy2) 100%);
+    padding: 64px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 30%, rgba(245,166,35,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta .section-eyebrow { color: var(--gold); }
+
+  .cta .section-h2 { color: var(--white); }
+  .cta .section-h2 span { color: var(--gold); }
+
+  .cta .section-sub { color: rgba(255,255,255,0.65); }
+
+  .cta-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(245,166,35,0.2);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 18px;
+  }
+
+  .cta-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gold2);
+    margin-bottom: 8px;
+  }
+
+  .cta-card p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 18px;
+    line-height: 1.6;
+  }
+
+  .form-row,
+  .share-form-row {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .form-row input,
+  .share-form-row input {
+    width: 100%;
+    padding: 13px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+    color: var(--white);
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .form-row input::placeholder,
+  .share-form-row input::placeholder {
+    color: rgba(255,255,255,0.4);
+  }
+
+  .form-row input:focus,
+  .share-form-row input:focus {
+    border-color: var(--gold);
+    background: rgba(255,255,255,0.1);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 40px;
+    background: var(--gold);
+    border: none;
+    color: var(--navy);
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+  }
+
+  .btn-primary:hover {
+    background: var(--gold2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(245,166,35,0.4);
+  }
+
+  .cta-success,
+  .share-success {
+    display: none;
+    text-align: center;
+    font-size: 13px;
+    color: var(--gold2);
+    font-weight: 500;
+    padding: 12px 0 4px;
+  }
+
+  /* Disclaimer */
+  .disclaimer-section {
+    background: var(--navy);
+    padding: 28px 32px 36px;
+  }
+
+  .disclaimer {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.6;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .disclaimer a { color: var(--gold2); text-decoration: none; }
+  .disclaimer a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .section { padding: 48px 24px; }
+    .hero { padding: 44px 24px 52px; }
+    .cta { padding: 52px 24px; }
+    .form-row, .share-form-row { grid-template-columns: 1fr; }
+    .proj-grid { grid-template-columns: 1fr; }
+    .easy-grid { grid-template-columns: 1fr; }
+    .emp-big { font-size: 44px; }
+    .result-val { font-size: 42px; }
+    .acc-toggle { padding: 18px 20px; }
+    .acc-title { font-size: 17px; }
+    .input-card { padding: 24px 20px 20px; }
+    .result-card { padding: 26px 20px; }
+    .cta-card { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="logo-row">
+      <div class="logo-mark">A</div>
+      <div class="logo-name">Asset<span>Align</span></div>
+    </div>
+    <div class="eyebrow">Employer Flex Fund Calculator</div>
+    <h1>Today, HR leaders face rising benefit costs and are asked to do <em>more with less</em>.</h1>
+    <p>AssetAlign is a zero-cost financial wellness platform that connects employees with a personalized financial plan and vetted financial advisor — and returns real money back to both the employee and the employer every year.</p>
+    <div class="pill-row">
+      <span class="pill pill-fill">One benefit</span>
+      <span class="pill pill-outline">Zero cost</span>
+      <span class="pill pill-outline">Real returns</span>
+    </div>
+  </div>
+</section>
+
+<!-- CALCULATOR -->
+<section class="section calc">
+  <div class="container">
+    <div class="section-eyebrow">See it for yourself</div>
+    <h2 class="section-h2">How much could AssetAlign return <span>to your company?</span></h2>
+    <p class="section-sub">Enter your number of employees below and we'll show you exactly how much real money AssetAlign could put back into your organization — every single year.</p>
+
+    <div class="input-card">
+      <div class="input-label">Number of employees</div>
+      <div class="emp-big" id="empVal">500</div>
+      <div class="emp-sub">employees</div>
+      <input type="range" id="empSlider" min="0" max="1000" step="1" value="155">
+      <div class="range-labels"><span>50</span><span>130,000</span></div>
+    </div>
+
+    <div class="input-card">
+      <div class="rate-row">
+        <div class="input-label" style="margin-bottom:0;">Participation rate</div>
+        <div class="rate-val-wrap">
+          <span class="rate-val" id="rateVal">40</span>
+          <span class="rate-pct">%</span>
+        </div>
+      </div>
+      <input type="range" id="rateSlider" min="1" max="100" step="1" value="40">
+      <div class="range-labels"><span>1%</span><span>100%</span></div>
+      <div class="rate-note">* 40% is the average participation rate across companies currently on the AssetAlign platform.</div>
+    </div>
+
+    <div style="height: 18px;"></div>
+
+    <div class="result-card employer">
+      <div class="result-label">Employer Flex Fund — returned annually</div>
+      <div class="result-val" id="annualVal">—</div>
+      <div class="result-desc">Real money returned to your company every single year — yours to save, reinvest, or put toward rising benefit costs like medical and health coverage.</div>
+    </div>
+
+    <div class="proj-grid" id="empProjGrid">
+      <div class="proj-card e"><div class="yr">Year 5</div><div class="pv" id="epv5">—</div></div>
+      <div class="proj-card e"><div class="yr">Year 10</div><div class="pv" id="epv10">—</div></div>
+    </div>
+    <p class="proj-note" id="empProjNote">Your flex fund grows as your employees' assets grow.</p>
+
+    <div class="result-card employee">
+      <div class="result-label">Employee Rewards — returned annually</div>
+      <div class="result-val" id="rewVal">—</div>
+      <div class="result-desc">Real money returned to your employees in aggregate every year — funds they can put toward mortgages, savings, or everyday financial goals.</div>
+    </div>
+
+    <div class="proj-grid" id="rewProjGrid">
+      <div class="proj-card r"><div class="yr">Year 5</div><div class="pv" id="rpv5">—</div></div>
+      <div class="proj-card r"><div class="yr">Year 10</div><div class="pv" id="rpv10">—</div></div>
+    </div>
+    <p class="proj-note" id="rewProjNote">Employee rewards grow alongside the Employer Flex Fund.</p>
+
+    <hr class="divider">
+
+    <div class="accordion">
+      <div class="acc-toggle" id="hiwToggle" onclick="toggleAcc('hiw')">
+        <div class="acc-left"><span class="acc-sublabel">Learn more</span><span class="acc-title">How does it work?</span></div>
+        <div class="acc-right"><span class="acc-icon" id="hiwIcon">&#9660;</span></div>
+      </div>
+      <div class="acc-panel" id="hiwPanel">
+        <div class="acc-inner">
+          <p>AssetAlign matches your employees with a vetted financial advisor and provides them with a personalized financial plan — completely free. As employees work with their advisors and grow their assets, AssetAlign generates revenue through the platform. A portion of that revenue is returned directly to your company every year as the Employer Flex Fund, and a portion goes back to employees as Employee Rewards. No fees. No catch. Just a benefit that pays for itself — and then some.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <div class="acc-toggle" id="catchToggle" onclick="toggleAcc('catch')">
+        <div class="acc-left"><span class="acc-sublabel">Transparency</span><span class="acc-title">Sounds too good to be true — what's the catch?</span></div>
+        <div class="acc-right"><span class="acc-icon" id="catchIcon">&#9660;</span></div>
+      </div>
+      <div class="acc-panel" id="catchPanel">
+        <div class="acc-inner">
+          <p>Think of it like your credit card rewards. You earn points and cash back for free — not because the bank is being generous, but because merchants fund the model. AssetAlign works the same way. We've built a three-sided marketplace where financial advisors generate revenue through the platform if your employees choose to engage with them. A portion of that revenue flows back to both the employer and the employee automatically. No tricks. No hidden fees. Just a model that aligns everyone's incentives.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <div class="acc-toggle" id="easyToggle" onclick="toggleAcc('easy')">
+        <div class="acc-left"><span class="acc-sublabel">Implementation</span><span class="acc-title">How easy is it to get started?</span></div>
+        <div class="acc-right"><span class="acc-icon" id="easyIcon">&#9660;</span></div>
+      </div>
+      <div class="acc-panel" id="easyPanel">
+        <div class="acc-inner">
+          <p style="margin-bottom:14px;">Adding AssetAlign to your benefits package requires no ongoing administration, no open enrollment window, and no heavy lifting from your team. We handle everything — from employee enrollment to ongoing communication — so you can offer a world-class financial wellness benefit without adding a single item to your to-do list.</p>
+          <div class="easy-grid">
+            <div class="easy-item"><div class="ei-title">No open enrollment</div><div class="ei-desc">Employees can join at any time — no waiting periods or annual windows required.</div></div>
+            <div class="easy-item"><div class="ei-title">Zero admin burden</div><div class="ei-desc">We handle enrollment, onboarding, and all ongoing employee communication.</div></div>
+            <div class="easy-item"><div class="ei-title">Always on</div><div class="ei-desc">AssetAlign runs quietly in the background, returning value all year long.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="container">
+    <div class="section-eyebrow">Take the next step</div>
+    <h2 class="section-h2">Ready to put AssetAlign <span>to work?</span></h2>
+    <p class="section-sub">Whether you'd like to learn more yourself or pass this along to someone who should see it — we're one quick form away.</p>
+
+    <div class="cta-card">
+      <h3>Interested in learning more?</h3>
+      <p>Enter your details below and one of our HR consultants will be in touch to walk you through the platform.</p>
+      <div class="form-row">
+        <input type="text" id="ctaName" placeholder="Your name">
+        <input type="email" id="ctaEmail" placeholder="Work email">
+      </div>
+      <button class="btn-primary" onclick="submitCTA()">I'd like to learn more →</button>
+      <div class="cta-success" id="ctaSuccess">Thanks! One of our HR consultants will be in touch shortly.</div>
+    </div>
+
+    <div class="cta-card">
+      <h3>Know someone who should see this?</h3>
+      <p>Enter their details below and we'll send them a personal note letting them know you thought this was worth their time.</p>
+      <div class="share-form-row">
+        <input type="text" id="shareSenderName" placeholder="Your name">
+        <input type="text" id="shareRecipientName" placeholder="Their name">
+      </div>
+      <div class="share-form-row">
+        <input type="email" id="shareRecipientEmail" placeholder="Their work email">
+        <input type="text" id="shareCompany" placeholder="Their company (optional)">
+      </div>
+      <button class="btn-primary" onclick="shareIt()">Send them this idea →</button>
+      <div class="share-success" id="shareSuccess">Sent! They'll receive a note shortly.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DISCLAIMER -->
+<section class="disclaimer-section">
+  <div class="disclaimer">
+    ABTW LLC, doing business as AssetAlign, is a Registered Investment Advisor. Individuals who refer prospective clients to AssetAlign may receive compensation for such introductions. By using this calculator and submitting your information, you acknowledge that you may have been referred by a compensated third party. This calculator is for informational and illustrative purposes only and does not constitute investment advice. Financial plans and advisory services are provided by ABTW LLC d/b/a AssetAlign or independent registered advisors connected through the platform. Projected returns are based on historical average market returns and are not guarantees of future results. Actual results will vary based on employee participation, individual asset levels, and market conditions. AssetAlign does not guarantee any specific financial outcome. Please review our <a href="https://adviserinfo.sec.gov/firm/summary/329950" target="_blank">Form ADV</a> for full disclosures. &nbsp;|&nbsp; * Projections assume selected participation rate, $250,000 average investable assets per participating employee, and a percentage of revenue generated through the AssetAlign platform returned to the Employer Flex Fund and employees as Employee Rewards. Asset values projected to grow at 8% per year based on historical average market returns.
+  </div>
+</section>
+
+<script>
+(function(){emailjs.init('kX8q18hmRaom62pMz');})();
+
+var SERVICE_ID='service_jy3zs68';
+var NOTIFY_TEMPLATE='template_a3slvpn';
+var SHARE_TEMPLATE='template_oil3rgm';
+
+function getRef(){
+  var params=new URLSearchParams(window.location.search);
+  return params.get('ref')||'direct';
+}
+
+function getTimestamp(){
+  return new Date().toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'});
+}
+
+function silentLog(type,details){
+  var ref=getRef();
+  emailjs.send(SERVICE_ID,NOTIFY_TEMPLATE,{
+    to_email:'support@assetalign.net',
+    subject: type==='visit'?'AssetAlign — New Calculator Visit':'AssetAlign — New Lead',
+    message: type==='visit'
+      ?'New visitor on the AssetAlign calculator.\n\nTime: '+getTimestamp()+'\nSource: '+ref
+      :'New lead from the AssetAlign calculator.\n\nName: '+details.name+'\nEmail: '+details.email+'\nTime: '+getTimestamp()+'\nSource: '+ref,
+    name: type==='lead'?details.name:'Visitor',
+    email: type==='lead'?details.email:'noreply@assetalign.net',
+    reply_to: type==='lead'?details.email:'noreply@assetalign.net'
+  });
+}
+
+window.addEventListener('load',function(){silentLog('visit',{});});
+
+function logSliderToEmp(val){
+  var minVal=50,maxVal=130000;
+  var minLog=Math.log(minVal),maxLog=Math.log(maxVal);
+  var scale=(maxLog-minLog)/1000;
+  return Math.round(Math.exp(minLog+scale*val)/50)*50;
+}
+function fmtFull(n){
+  if(n>=1000000000)return '$'+(n/1000000000).toFixed(2)+'B';
+  if(n>=1000000)return '$'+(n/1000000).toFixed(2)+'M';
+  return '$'+Math.round(n).toLocaleString();
+}
+var projTimer=null;
+function calc(){
+  var sliderVal=parseInt(document.getElementById('empSlider').value);
+  var emp=logSliderToEmp(sliderVal);
+  var rate=parseInt(document.getElementById('rateSlider').value)/100;
+  document.getElementById('empVal').textContent=emp.toLocaleString();
+  document.getElementById('rateVal').textContent=Math.round(rate*100);
+  var aum0=Math.round(emp*rate)*250000;
+  var flex0=aum0*0.01*0.375*0.25;
+  var flex5=(aum0*Math.pow(1.08,4))*0.01*0.375*0.25;
+  var flex10=(aum0*Math.pow(1.08,9))*0.01*0.375*0.25;
+  document.getElementById('annualVal').textContent=fmtFull(flex0);
+  document.getElementById('rewVal').textContent=fmtFull(flex0);
+  var eg=document.getElementById('empProjGrid'),en=document.getElementById('empProjNote');
+  var rg=document.getElementById('rewProjGrid'),rn=document.getElementById('rewProjNote');
+  eg.classList.remove('visible');en.classList.remove('visible');
+  rg.classList.remove('visible');rn.classList.remove('visible');
+  document.getElementById('epv5').textContent=fmtFull(Math.round(flex5));
+  document.getElementById('epv10').textContent=fmtFull(Math.round(flex10));
+  document.getElementById('rpv5').textContent=fmtFull(Math.round(flex5));
+  document.getElementById('rpv10').textContent=fmtFull(Math.round(flex10));
+  if(projTimer)clearTimeout(projTimer);
+  projTimer=setTimeout(function(){
+    eg.classList.add('visible');en.classList.add('visible');
+    rg.classList.add('visible');rn.classList.add('visible');
+  },1800);
+}
+function toggleAcc(id){
+  document.getElementById(id+'Panel').classList.toggle('open');
+  document.getElementById(id+'Icon').classList.toggle('open');
+  document.getElementById(id+'Toggle').classList.toggle('open');
+}
+function submitCTA(){
+  var name=document.getElementById('ctaName').value.trim();
+  var email=document.getElementById('ctaEmail').value.trim();
+  if(!name||!email){alert('Please enter your name and email.');return;}
+  silentLog('lead',{name:name,email:email});
+  document.getElementById('ctaName').value='';
+  document.getElementById('ctaEmail').value='';
+  document.getElementById('ctaSuccess').style.display='block';
+}
+function shareIt(){
+  var senderName=document.getElementById('shareSenderName').value.trim();
+  var recipientName=document.getElementById('shareRecipientName').value.trim();
+  var recipientEmail=document.getElementById('shareRecipientEmail').value.trim();
+  var company=document.getElementById('shareCompany').value.trim();
+  if(!senderName||!recipientEmail){alert('Please enter your name and their email.');return;}
+  var ref=senderName.toLowerCase().replace(/\s+/g,'');
+  var calcUrl='https://assetalignhrcalculator.netlify.app?ref='+ref;
+  emailjs.send(SERVICE_ID,NOTIFY_TEMPLATE,{
+    to_email:'support@assetalign.net',
+    subject:'AssetAlign — Calculator Shared',
+    message:senderName+' just shared the calculator with '+(recipientName||'a contact')+' ('+recipientEmail+')'+(company?' at '+company:'')+('.\n\nTime: '+getTimestamp()+'\nSource: '+ref),
+    name:senderName,
+    email:'noreply@assetalign.net',
+    reply_to:'noreply@assetalign.net'
+  });
+  emailjs.send(SERVICE_ID,SHARE_TEMPLATE,{
+    sender_name: senderName,
+    recipient_name: recipientName||'there',
+    recipient_email: recipientEmail,
+    company: company||'your company',
+    calc_url: calcUrl,
+    reply_to: 'noreply@assetalign.net'
+  }).then(function(){
+    document.getElementById('shareSenderName').value='';
+    document.getElementById('shareRecipientName').value='';
+    document.getElementById('shareRecipientEmail').value='';
+    document.getElementById('shareCompany').value='';
+    document.getElementById('shareSuccess').style.display='block';
+  },function(err){
+    alert('Something went wrong. Please try again.');
+    console.log(err);
+  });
+}
+document.getElementById('empSlider').addEventListener('input',calc);
+document.getElementById('rateSlider').addEventListener('input',calc);
+calc();
+</script>
+</body>
+</html>
