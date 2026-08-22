@@ -831,21 +831,56 @@ function getTimestamp(){
   return new Date().toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'});
 }
 
+function getDevice(){
+  return /Mobile|Android|iPhone|iPad/.test(navigator.userAgent)?'Mobile':'Desktop';
+}
+
+// Owner self-mute: open the link once with ?me=1 to silence notifications from THIS browser/device.
+function isOwner(){
+  try{
+    var p=new URLSearchParams(window.location.search);
+    if(p.get('me')==='1'){localStorage.setItem('aa_owner','1');}
+    if(p.get('me')==='0'){localStorage.removeItem('aa_owner');}
+    return localStorage.getItem('aa_owner')==='1';
+  }catch(e){return false;}
+}
+
+function sendVisit(geo){
+  var ref=getRef();
+  var device=getDevice();
+  var referrer=document.referrer||'direct';
+  var loc=geo?((geo.city||'?')+', '+(geo.region||'?')+', '+(geo.country_name||geo.country||'?')):'unavailable';
+  var ip=geo?(geo.ip||'?'):'unavailable';
+  var net=geo?(geo.org||geo.asn||'?'):'unavailable';
+  emailjs.send(SERVICE_ID,NOTIFY_TEMPLATE,{
+    to_email:'alex@assetalign.net',
+    subject:'AssetAlign Calculator — Opened',
+    message:'New visitor on the AssetAlign calculator.\n\nLocation: '+loc+'\nIP: '+ip+'\nNetwork / ISP: '+net+'\nDevice: '+device+'\nCame from: '+referrer+'\nTime: '+getTimestamp()+'\nSource: '+ref,
+    name:'Visitor',
+    email:'noreply@assetalign.net',
+    reply_to:'noreply@assetalign.net'
+  });
+}
+
 function silentLog(type,details){
   var ref=getRef();
   emailjs.send(SERVICE_ID,NOTIFY_TEMPLATE,{
     to_email:'support@assetalign.net',
-    subject: type==='visit'?'AssetAlign — New Calculator Visit':'AssetAlign — New Lead',
-    message: type==='visit'
-      ?'New visitor on the AssetAlign calculator.\n\nTime: '+getTimestamp()+'\nSource: '+ref
-      :'New lead from the AssetAlign calculator.\n\nName: '+details.name+'\nEmail: '+details.email+'\nTime: '+getTimestamp()+'\nSource: '+ref,
-    name: type==='lead'?details.name:'Visitor',
-    email: type==='lead'?details.email:'noreply@assetalign.net',
-    reply_to: type==='lead'?details.email:'noreply@assetalign.net'
+    subject:'AssetAlign — New Lead',
+    message:'New lead from the AssetAlign calculator.\n\nName: '+details.name+'\nEmail: '+details.email+'\nTime: '+getTimestamp()+'\nSource: '+ref,
+    name:details.name,
+    email:details.email,
+    reply_to:details.email
   });
 }
 
-window.addEventListener('load',function(){silentLog('visit',{});});
+window.addEventListener('load',function(){
+  if(isOwner())return;
+  fetch('https://ipapi.co/json/')
+    .then(function(r){return r.json();})
+    .then(function(geo){sendVisit(geo);})
+    .catch(function(){sendVisit(null);});
+});
 
 function logSliderToEmp(val){
   var minVal=50,maxVal=130000;
